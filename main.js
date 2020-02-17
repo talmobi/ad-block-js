@@ -9,7 +9,186 @@ Object.keys( process.env ).forEach(
   }
 )
 
+module.exports = create
+module.exports.create = create
 module.exports.testRule = testRuleText
+
+function create ( options ) {
+  options = options || {}
+  if ( typeof options !== 'object' ) throw new Error( 'options has to be an object' )
+
+  const api = {
+    rawRules: [],
+    rules: []
+  }
+
+  api.parse = api.add = function add ( rule ) {
+    api.rawRules.push( rule )
+
+    rule = rule.trim()
+    rule = rule.replace( /[\r\n]/g, '' ) // replace all new-lines
+
+    if ( rule[ 0 ] === '!' ) {
+      // comment, ignore
+      return
+    }
+
+    const r = {
+      hasStart: false,
+      hasEnd: false,
+      text: rule
+    }
+
+    if ( rule.indexOf( '@@' ) === 0 ) {
+      // exception
+      // TODO
+    } else if ( rule[ 0 ] === '|' && rule[ 1 ] === '|' ) {
+      // domain
+      r.domain = true
+      const text = rule.slice( 2 )
+
+      // normalize rule
+      if ( text.indexOf( 'https://' ) === 0 ) {
+        text = text.slice( 'https://' )
+      }
+      if ( text.indexOf( 'http://' ) === 0 ) {
+        text = text.slice( 'http://' )
+      }
+      if ( text.indexOf( 'www.' ) === 0 ) {
+        text = text.slice( 'www.' )
+      }
+
+      r.text = text
+    } else if ( rule[ 0 ] === '|' ) {
+      // start
+      r.hasStart = true
+      r.text = rule.slice( 1 )
+    } else if ( rule[ rule.length - 1 ] === '|' ) {
+      // end
+      r.hasEnd = true
+      r.text = rule.slice( 0, -1 )
+    }
+
+    console.log( r.text )
+
+    const chunks = r.text.split( /\*+/ ).filter( function ( i ) { return i } )
+
+    r.chunks = chunks
+
+    // TODO bloom chunks?
+
+    api.rules.push( r )
+  }
+
+  api.matches = function matches ( url ) {
+    for ( let i = 0; i < api.rules.length; i++ ) {
+      const r = api.rules[ i ]
+      const matches = testRuleObject( r, url )
+      if ( matches ) return true
+    }
+
+    return false
+  }
+
+  return api
+}
+
+function testRuleObject ( r, url ) {
+  const chunks = r.chunks
+  const hasStart = r.hasStart
+  const hasEnd = r.hasEnd
+
+  if ( r.domain ) {
+    // normalize url
+    if ( url.indexOf( 'https://' ) === 0 ) {
+      url = url.slice( 'https://' )
+    }
+    if ( url.indexOf( 'http://' ) === 0 ) {
+      url = url.slice( 'http://' )
+    }
+    if ( url.indexOf( 'www.' ) === 0 ) {
+      url = url.slice( 'www.' )
+    }
+  }
+
+  let lastIndexOf = 0
+  chunk_loop:
+  for ( let i = 0; i < chunks.length; i++ ) {
+    debugLog( 'lastIndexOf: ' + lastIndexOf )
+
+    const chunk = chunks[ i ]
+    if ( chunk === '' ) continue
+    debugLog( 'chunk: ' + chunk )
+
+    // used to decrease final length by 1
+    // when separator ( ^ ) matches EOL
+    let hasEOL = false
+
+    let matching = false
+    url_loop:
+    for ( let j = 0; j < url.length; j++ ) {
+      matching = false
+
+      for ( let k = 0; k < chunk.length; k++ ) {
+        const c = chunk[ k ]
+        let u = url[ j + k ]
+
+        // handle EOL
+        if ( ( j + k ) === url.length ) {
+          hasEOL = true
+          u = '\n'
+        }
+
+        if ( !u ) return false // out of scope
+
+        if ( ruleCharMathes( c, u ) ) {
+          debugLog( 'matches: ' + c )
+          matching = true
+          continue
+        } else {
+          hasEOL = false
+          matching = false
+          debugLog( 'nomatch: ' + c )
+          continue url_loop
+        }
+      }
+
+      if ( !matching ) return false
+
+      debugLog( ' matching done.' )
+
+      // matches
+      const indexOf = j
+      debugLog( 'indexOf: ' + indexOf )
+      debugLog( 'lastIndexOf: ' + lastIndexOf )
+
+      if ( indexOf < lastIndexOf ) return false
+      lastIndexOf = indexOf
+
+      const firstChunk = ( i === 0 )
+      const lastChunk = ( i === ( chunks.length - 1 ) )
+
+      if ( hasStart && firstChunk ) {
+        if ( indexOf !== 0 ) return false
+      }
+
+      if ( hasEnd && lastChunk ) {
+        let extra = 0
+        if ( hasEOL ) extra = 1
+        if (
+          indexOf !== ( url.length - chunk.length + extra )
+        ) return false
+      }
+
+      continue chunk_loop
+    }
+
+    if ( !matching ) return false
+  }
+
+  // all chunks done and everything OK
+  return true
+}
 
 function debugLog ( ...args ) {
   if ( !_envs.debug_ad_block_js ) return
