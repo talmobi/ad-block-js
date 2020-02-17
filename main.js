@@ -62,13 +62,21 @@ function create ( options ) {
       r.text = rule.slice( 0, -1 )
     }
 
-    console.log( r.text )
+    // options are not supported atm, so parse them away
+    const lastDollarIndex = r.text.lastIndexOf( '$' )
+    if ( lastDollarIndex >= 0 ) {
+      r.text = r.text.slice( 0, lastDollarIndex )
+      return
+    }
+
+    // regex not supported, so ignore them
+    if ( r.text[ 0 ] === '/' && r.text[ r.text.length - 1 ] === '/' ) {
+      return
+    }
 
     const chunks = r.text.split( /\*+/ ).filter( function ( i ) { return i } )
 
     r.chunks = chunks
-
-    // TODO bloom chunks?
 
     api.rules.push( r )
   }
