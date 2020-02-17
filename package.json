@@ -4,7 +4,8 @@
   "description": "parse ad-block rules",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "debug": "debug_ad_block_js=1 node test/test.js",
+    "test": "node test/test.js"
   },
   "keywords": [
     "ad-block-js"
