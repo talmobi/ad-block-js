@@ -1,5 +1,3 @@
-module.exports = testRule
-
 const _envs = {}
 Object.keys( process.env ).forEach(
   function ( key ) {
@@ -11,6 +9,8 @@ Object.keys( process.env ).forEach(
   }
 )
 
+module.exports.testRule = testRuleText
+
 function debugLog ( ...args ) {
   if ( !_envs.debug_ad_block_js ) return
   console.log.apply( this, args )
@@ -18,7 +18,7 @@ function debugLog ( ...args ) {
 
 // parse easylist rules
 // ref: https://help.eyeo.com/en/adblockplus/how-to-write-filters#introduction
-function testRule ( rule, url ) {
+function testRuleText ( rule, url ) {
   if ( rule[ 0 ] === '!' ) {
     // comment
     return false
