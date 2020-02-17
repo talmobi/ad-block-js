@@ -358,13 +358,13 @@ function ruleCharMathes ( a, b ) {
 
 function normalizeDomain ( text ) {
   if ( text.indexOf( 'https://' ) === 0 ) {
-    text = text.slice( 'https://' )
+    text = text.slice( 'https://'.length )
   }
   if ( text.indexOf( 'http://' ) === 0 ) {
-    text = text.slice( 'http://' )
+    text = text.slice( 'http://'.length )
   }
   if ( text.indexOf( 'www.' ) === 0 ) {
-    text = text.slice( 'www.' )
+    text = text.slice( 'www.'.length )
   }
   return text
 }
