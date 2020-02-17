@@ -39,9 +39,12 @@ function create ( options ) {
       text: rule
     }
 
-    if ( rule.indexOf( '@@' ) === 0 ) {
-      // exception
-      // TODO
+    if ( rule.indexOf( '##' ) >= 0 ) {
+      // element hide rule, not supported
+      return
+    } else if ( rule.indexOf( '@@' ) === 0 ) {
+      // exception, not supported
+      return
     } else if ( rule[ 0 ] === '|' && rule[ 1 ] === '|' ) {
       // domain
       r.domain = true
