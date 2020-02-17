@@ -48,20 +48,10 @@ function create ( options ) {
     } else if ( rule[ 0 ] === '|' && rule[ 1 ] === '|' ) {
       // domain
       r.domain = true
-      const text = rule.slice( 2 )
+      let text = rule.slice( 2 )
 
       // normalize rule
-      if ( text.indexOf( 'https://' ) === 0 ) {
-        text = text.slice( 'https://' )
-      }
-      if ( text.indexOf( 'http://' ) === 0 ) {
-        text = text.slice( 'http://' )
-      }
-      if ( text.indexOf( 'www.' ) === 0 ) {
-        text = text.slice( 'www.' )
-      }
-
-      r.text = text
+      r.text = normalizeDomain( text )
     } else if ( rule[ 0 ] === '|' ) {
       // start
       r.hasStart = true
@@ -102,16 +92,7 @@ function testRuleObject ( r, url ) {
   const hasEnd = r.hasEnd
 
   if ( r.domain ) {
-    // normalize url
-    if ( url.indexOf( 'https://' ) === 0 ) {
-      url = url.slice( 'https://' )
-    }
-    if ( url.indexOf( 'http://' ) === 0 ) {
-      url = url.slice( 'http://' )
-    }
-    if ( url.indexOf( 'www.' ) === 0 ) {
-      url = url.slice( 'www.' )
-    }
+    url = normalizeDomain( url )
   }
 
   let lastIndexOf = 0
@@ -365,4 +346,17 @@ function ruleCharMathes ( a, b ) {
     )
   }
   return a === b
+}
+
+function normalizeDomain ( text ) {
+  if ( text.indexOf( 'https://' ) === 0 ) {
+    text = text.slice( 'https://' )
+  }
+  if ( text.indexOf( 'http://' ) === 0 ) {
+    text = text.slice( 'http://' )
+  }
+  if ( text.indexOf( 'www.' ) === 0 ) {
+    text = text.slice( 'www.' )
+  }
+  return text
 }
