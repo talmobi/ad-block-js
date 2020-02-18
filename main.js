@@ -28,6 +28,9 @@ function create ( options ) {
     rule = rule.trim()
     rule = rule.replace( /[\r\n]/g, '' ) // replace all new-lines
 
+    // ignore rules that are too short
+    if ( rule.length <= 3 ) return
+
     if ( rule[ 0 ] === '!' ) {
       // comment, ignore
       return
@@ -74,6 +77,9 @@ function create ( options ) {
     if ( r.text[ 0 ] === '/' && r.text[ r.text.length - 1 ] === '/' ) {
       return
     }
+
+    // ignore patterns that are too short
+    if ( r.text.length <= 3 ) return
 
     const chunks = r.text.split( /\*+/ ).filter( function ( i ) { return i } )
 
@@ -162,6 +168,7 @@ function testRuleObject ( r, url, cache ) {
       debugLog( 'before: ' + url[ position - 1 ] )
       if ( !isSeparator( url[ position - 1 ] ) ) return false
     }
+
     if ( item.after ) {
       const n = position + item.text.length
       debugLog( 'after: ' + url[ n ] )
@@ -171,6 +178,8 @@ function testRuleObject ( r, url, cache ) {
       ) return false
     }
   }
+
+  debugLog( 'passed rule: ' + r.rule )
 
   // all chunks done and everything OK
   return true
