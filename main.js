@@ -176,6 +176,16 @@ function testRuleObject ( r, url, cache ) {
   return true
 }
 
+function iterativeIndexOf ( text, pattern ) {
+  let results = []
+  let matchIndex = text.indexOf( pattern )
+  while ( matchIndex !== -1 ) {
+    results.push( matchIndex )
+    matchIndex = text.indexOf( pattern, matchIndex + 1 )
+  }
+  return results
+}
+
 function debugLog ( ...args ) {
   if ( !_envs.debug_ad_block_js ) return
   console.log.apply( this, args )
