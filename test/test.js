@@ -82,3 +82,43 @@ test( 'advanced samples', function ( t ) {
 
   t.end()
 } )
+
+test( 'benchmark', function ( t ) {
+  const fs = require( 'fs' )
+  const path = require( 'path' )
+  const rules = (
+    fs.readFileSync( path.join( __dirname, './easylist.txt' ), 'utf8' )
+    .split( /\r?\n\r?/ )
+  )
+
+  const urls = (
+    fs.readFileSync( path.join( __dirname, './urls.txt' ), 'utf8' )
+    .split( /\r?\n\r?/ )
+  )
+
+  const client = abjs.create()
+
+  for ( let i = 0; i < rules.length; i++ ) {
+    const rule = rules[ i ]
+    client.add( rule )
+  }
+
+
+  const startTime = Date.now()
+
+  for ( let i = 0; i < urls.length; i++ ) {
+    const url = urls[ i ]
+
+    const now = Date.now()
+    client.matches( url )
+    const delta = Date.now() - now
+    t.comment( 'url: ' + url )
+    t.comment( 'took: ' + delta + ' ms' )
+  }
+
+  const delta = Date.now() - startTime
+  t.comment( 'total time: ' + delta + ' ms' )
+
+  t.ok( delta < 500, 'benchmark acceptable' )
+  t.end()
+} )
