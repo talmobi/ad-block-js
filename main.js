@@ -121,56 +121,11 @@ function create ( options ) {
   return api
 }
 
-function testRuleObject ( r, url ) {
-  const chunks = r.chunks
-  const hasStart = r.hasStart
-  const hasEnd = r.hasEnd
+function testRuleObject ( r, url, cache ) {
+  const items = r.items
 
   if ( r.domain ) {
-    url = normalizeDomain( url )
-  }
-
-  let lastIndexOf = 0
-  chunk_loop:
-  for ( let i = 0; i < chunks.length; i++ ) {
-    debugLog( 'lastIndexOf: ' + lastIndexOf )
-
-    const chunk = chunks[ i ]
-    if ( chunk === '' ) continue
-    debugLog( 'chunk: ' + chunk )
-
-    // used to decrease final length by 1
-    // when separator ( ^ ) matches EOL
-    let hasEOL = false
-
-    let matching = false
-    url_loop:
-    for ( let j = 0; j < url.length; j++ ) {
-      matching = false
-
-      for ( let k = 0; k < chunk.length; k++ ) {
-        const c = chunk[ k ]
-        let u = url[ j + k ]
-
-        // handle EOL
-        if ( ( j + k ) === url.length ) {
-          hasEOL = true
-          u = '\n'
-        }
-
-        if ( !u ) return false // out of scope
-
-        if ( ruleCharMathes( c, u ) ) {
-          debugLog( 'matches: ' + c )
-          matching = true
-          continue
-        } else {
-          hasEOL = false
-          matching = false
-          debugLog( 'nomatch: ' + c )
-          continue url_loop
-        }
-      }
+    debugLog( ' === domain === ' )
 
     if ( cache.domainUrl ) {
       url = cache.domainUrl
@@ -180,35 +135,41 @@ function testRuleObject ( r, url ) {
     }
   }
 
-      debugLog( ' matching done.' )
+  debugLog( 'rule: ' + r.rule )
+  debugLog( 'url: ' + url )
 
-      // matches
-      const indexOf = j
-      debugLog( 'indexOf: ' + indexOf )
-      debugLog( 'lastIndexOf: ' + lastIndexOf )
+  let position = -1
+  for ( let i = 0; i < items.length; i++ ) {
+    const item = items[ i ]
 
-      if ( indexOf < lastIndexOf ) return false
-      lastIndexOf = indexOf
+    const indexOf = url.indexOf( item.text, position + 1 )
+    if ( indexOf <= position ) return false
+    position = indexOf
 
-      const firstChunk = ( i === 0 )
-      const lastChunk = ( i === ( chunks.length - 1 ) )
+    debugLog( 'text: ' + item.text )
+    debugLog( 'position: ' + position )
 
-      if ( hasStart && firstChunk ) {
-        if ( indexOf !== 0 ) return false
-      }
-
-      if ( hasEnd && lastChunk ) {
-        let extra = 0
-        if ( hasEOL ) extra = 1
-        if (
-          indexOf !== ( url.length - chunk.length + extra )
-        ) return false
-      }
-
-      continue chunk_loop
+    if ( r.hasStart && i === 0 ) {
+      if ( indexOf !== 0 ) return false
     }
 
-    if ( !matching ) return false
+    if ( r.hasEnd && i === ( items.length - 1 ) ) {
+      let len = url.length - item.text.length
+      if ( indexOf !== len ) return false
+    }
+
+    if ( item.before ) {
+      debugLog( 'before: ' + url[ position - 1 ] )
+      if ( !isSeparator( url[ position - 1 ] ) ) return false
+    }
+    if ( item.after ) {
+      const n = position + item.text.length
+      debugLog( 'after: ' + url[ n ] )
+      if (
+        url[ n ] !== undefined && // EOL OK
+        !isSeparator( url[ n ] )
+      ) return false
+    }
   }
 
   // all chunks done and everything OK
@@ -373,6 +334,16 @@ function successiveMatches ( matches, text ) {
     n = indexOf
   }
   return true
+}
+
+function isSeparator ( a ) {
+  return (
+    a === '/' ||
+    a === ':' ||
+    a === '?' ||
+    a === '=' ||
+    a === '&'
+  )
 }
 
 function ruleCharMathes ( a, b ) {
