@@ -1,6 +1,12 @@
 const test = require( 'tape' )
 
-const testRule = require( '../main.js' )
+const abjs = require( '../main.js' )
+
+function testRule ( rule, url ) {
+  const client = abjs.create()
+  client.add( rule )
+  return client.matches( url )
+}
 
 test( 'basic ( *foo* == foo )', function ( t ) {
   const url = 'http://example.com/foo/bar.gif'
