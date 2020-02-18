@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "description": "parse subset of ad-block request blocking rules",
   "main": "main.js",
+  "files": [
+    "main.js"
+  ],
   "scripts": {
     "debug": "debug_ad_block_js=1 node test/test.js",
     "test": "node test/test.js"
