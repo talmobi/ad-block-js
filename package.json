@@ -22,6 +22,7 @@
     "email": "talmo.christian@gmail.com"
   },
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "tape": "~4.13.0"
+  }
 }
-
