@@ -8,6 +8,68 @@ function testRule ( rule, url ) {
   return client.matches( url )
 }
 
+test( 'sample passing urls', function ( t ) {
+  const fs = require( 'fs' )
+  const path = require( 'path' )
+  const rules = (
+    fs.readFileSync( path.join( __dirname, './easylist.txt' ), 'utf8' )
+    .split( /\r?\n\r?/ )
+  )
+
+  // const urls = (
+  //   fs.readFileSync( path.join( __dirname, './urls.txt' ), 'utf8' )
+  //   .split( /\r?\n\r?/ )
+  // )
+  const urls = [
+    'https://www.youtube.com/watch?v=Gu2pVPWGYMQ'
+  ]
+
+  const client = abjs.create()
+
+  for ( let i = 0; i < rules.length; i++ ) {
+    const rule = rules[ i ]
+    client.add( rule )
+  }
+
+  for ( let i = 0; i < urls.length; i++ ) {
+    const url = urls[ i ]
+    t.equal( client.matches( url ), false )
+  }
+
+  t.end()
+} )
+
+test( 'sample blocking urls', function ( t ) {
+  const fs = require( 'fs' )
+  const path = require( 'path' )
+  const rules = (
+    fs.readFileSync( path.join( __dirname, './easylist.txt' ), 'utf8' )
+    .split( /\r?\n\r?/ )
+  )
+
+  // const urls = (
+  //   fs.readFileSync( path.join( __dirname, './urls.txt' ), 'utf8' )
+  //   .split( /\r?\n\r?/ )
+  // )
+  const urls = [
+    'https://www.youtube.com/watch?v=Gu2pVPWGYMQ&ad_box_'
+  ]
+
+  const client = abjs.create()
+
+  for ( let i = 0; i < rules.length; i++ ) {
+    const rule = rules[ i ]
+    client.add( rule )
+  }
+
+  for ( let i = 0; i < urls.length; i++ ) {
+    const url = urls[ i ]
+    t.equal( client.matches( url ), true )
+  }
+
+  t.end()
+} )
+
 test( 'basic ( *foo* == foo )', function ( t ) {
   const url = 'http://example.com/foo/bar.gif'
 
@@ -102,7 +164,6 @@ test( 'benchmark', function ( t ) {
     const rule = rules[ i ]
     client.add( rule )
   }
-
 
   const startTime = Date.now()
 
