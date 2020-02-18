@@ -108,9 +108,10 @@ function create ( options ) {
   }
 
   api.matches = function matches ( url ) {
+    const cache = {}
     for ( let i = 0; i < api.rules.length; i++ ) {
       const r = api.rules[ i ]
-      const matches = testRuleObject( r, url )
+      const matches = testRuleObject( r, url, cache )
       if ( matches ) return true
     }
 
@@ -171,7 +172,13 @@ function testRuleObject ( r, url ) {
         }
       }
 
-      if ( !matching ) return false
+    if ( cache.domainUrl ) {
+      url = cache.domainUrl
+    } else {
+      url = normalizeDomain( url )
+      cache.domainUrl = url
+    }
+  }
 
       debugLog( ' matching done.' )
 
