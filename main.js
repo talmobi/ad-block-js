@@ -36,6 +36,7 @@ function create ( options ) {
     const r = {
       hasStart: false,
       hasEnd: false,
+      rule: rule,
       text: rule
     }
 
@@ -76,7 +77,32 @@ function create ( options ) {
 
     const chunks = r.text.split( /\*+/ ).filter( function ( i ) { return i } )
 
-    r.chunks = chunks
+    r.items = []
+
+    for ( let i = 0; i < chunks.length; i++ ) {
+      const chunk = chunks[ i ]
+      const seps = chunk.split( '^' )
+      if ( seps.length > 0 ) {
+        for ( let i = 0; i < seps.length; i++ ) {
+          const t = seps[ i ]
+          if ( t === '' ) continue
+          const last = seps[ i - 1 ]
+          const next = seps[ i + 1 ]
+
+          r.items.push( {
+            text: t,
+            before: last !== undefined,
+            after:  next !== undefined
+          } )
+        }
+      } else {
+        r.items.push( {
+          text: chunk,
+          before: false,
+          after: false
+        } )
+      }
+    }
 
     api.rules.push( r )
   }
