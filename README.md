@@ -4,7 +4,7 @@
 #  ad-block-js
 parse subset of ad-block address/url blocking rules
 
-supports: *wildcards*, ||domain, |beginning, end|, separator^ ( /:?=& )
+supports: \*wildcards\*, ||domain, |beginning, end|, separator^ ( /:?=& )
 
 ignores: @@exceptions, $options, ##elements
 
