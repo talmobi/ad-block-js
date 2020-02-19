@@ -64,3 +64,7 @@ npm test
 node test/test-for-loop.js
 ```
 
+
+## Roadmap
+
+add support for: @@exceptions, $options, ##elements, /regex/
