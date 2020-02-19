@@ -6,7 +6,7 @@ parse subset of ad-block address/url blocking rules
 
 supports: \*wildcards\*, ||domain, |beginning, end|, separator^ ( /:?=& )
 
-ignores: @@exceptions, $options, ##elements
+ignores: @@exceptions, $options, ##elements, /regex/
 
 ref: https://help.eyeo.com/en/adblockplus/how-to-write-filters#introduction
 
