@@ -1,5 +1,6 @@
 [![npm](https://img.shields.io/npm/v/ad-block-js.svg?maxAge=3600&style=flat-square)](https://www.npmjs.com/package/ad-block-js)
 [![npm](https://img.shields.io/npm/l/ad-block-js.svg?maxAge=3600&style=flat-square)](https://github.com/talmobi/ad-block-js/blob/master/LICENSE)
+![Build](https://github.com/talmobi/ad-block-js/workflows/Build/badge.svg)
 
 #  ad-block-js
 parse subset of ad-block address/url blocking rules
