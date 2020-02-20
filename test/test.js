@@ -16,13 +16,11 @@ test( 'sample passing urls', function ( t ) {
     .split( /\r?\n\r?/ )
   )
 
-  // const urls = (
-  //   fs.readFileSync( path.join( __dirname, './urls.txt' ), 'utf8' )
-  //   .split( /\r?\n\r?/ )
-  // )
-  const urls = [
-    'https://www.youtube.com/watch?v=Gu2pVPWGYMQ'
-  ]
+  const urls = (
+    fs.readFileSync( path.join( __dirname, './passed-url-samples.txt' ), 'utf8' )
+    .split( /\r?\n\r?/ )
+    .filter( function ( url ) { return url.trim() } )
+  )
 
   const client = abjs.create()
 
@@ -33,7 +31,9 @@ test( 'sample passing urls', function ( t ) {
 
   for ( let i = 0; i < urls.length; i++ ) {
     const url = urls[ i ]
-    t.equal( client.matches( url ), false )
+    const match = client.matches( url )
+    if ( match !== false ) t.comment( 'url: ' + url )
+    t.equal( match, false )
   }
 
   t.end()
@@ -47,13 +47,11 @@ test( 'sample blocking urls', function ( t ) {
     .split( /\r?\n\r?/ )
   )
 
-  // const urls = (
-  //   fs.readFileSync( path.join( __dirname, './urls.txt' ), 'utf8' )
-  //   .split( /\r?\n\r?/ )
-  // )
-  const urls = [
-    'https://www.youtube.com/watch?v=Gu2pVPWGYMQ&ad_box_'
-  ]
+  const urls = (
+    fs.readFileSync( path.join( __dirname, './blocked-url-samples.txt' ), 'utf8' )
+    .split( /\r?\n\r?/ )
+    .filter( function ( url ) { return url.trim() } )
+  )
 
   const client = abjs.create()
 
@@ -64,7 +62,9 @@ test( 'sample blocking urls', function ( t ) {
 
   for ( let i = 0; i < urls.length; i++ ) {
     const url = urls[ i ]
-    t.equal( client.matches( url ), true )
+    const match = client.matches( url )
+    if ( match !== true ) t.comment( 'url: ' + url )
+    t.equal( match, true )
   }
 
   t.end()
