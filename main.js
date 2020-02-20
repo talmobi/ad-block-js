@@ -220,26 +220,10 @@ function testRuleText ( rule, url ) {
     rule = rule.slice( 2 )
 
     // normalize rule
-    if ( rule.indexOf( 'https://' ) === 0 ) {
-      rule = rule.slice( 'https://' )
-    }
-    if ( rule.indexOf( 'http://' ) === 0 ) {
-      rule = rule.slice( 'http://' )
-    }
-    if ( rule.indexOf( 'www.' ) === 0 ) {
-      rule = rule.slice( 'www.' )
-    }
+    rule = normalizeDomain( rule )
 
     // normalize url
-    if ( url.indexOf( 'https://' ) === 0 ) {
-      url = url.slice( 'https://' )
-    }
-    if ( url.indexOf( 'http://' ) === 0 ) {
-      url = url.slice( 'http://' )
-    }
-    if ( url.indexOf( 'www.' ) === 0 ) {
-      url = url.slice( 'www.' )
-    }
+    url = normalizeDomain( url )
   } else if ( rule[ 0 ] === '|' ) {
     // beginning
     hasStart = true
